@@ -3,6 +3,9 @@ import java.util.List;
 
 public class EmployeeTest {
     public static void main(String[] args) {
+        // create company
+        Company company = new Company();
+
         // create manager
         Manager manager = new Manager("Gregorics Tibor", 100000.0f);
 
@@ -17,20 +20,44 @@ public class EmployeeTest {
         manager.addEmployee(sub1);
         manager.addEmployee(sub2);
 
-        System.out.println("Manager: " + manager.getName() + ", Salary: " + manager.getSalary() + " Ft");
-        System.out.println("Subordinate 1: " + sub1.getName() + ", Salary: " + sub1.getSalary() + " Ft");
-        System.out.println("Subordinate 2: " + sub2.getName() + ", Salary: " + sub2.getSalary() + " Ft");
+        // add everyone to the company
+        company.addSalariedEntity(manager);
+        company.addSalariedEntity(sub1);
+        company.addSalariedEntity(sub2);
+        company.addSalariedEntity(subcontractor);
 
-        // remove a subordinate
+        // print initial salaries
+        System.out.println("Initial salaries:");
+        printSalaries(company);
+
+        // raise employee salaries by 15%
+        company.raiseEmployeeSalaries(0.15f);
+
+        // after raise salaries
+        System.out.println("Raised salaries:");
+        printSalaries(company);
+
+        // remove subordinate
+        company.removeSalariedEntity(sub2);
         manager.removeEmployee(sub2);
 
-        System.out.println("\nAfter removing a subordinate:");
-        System.out.println("Manager: " + manager.getName() + ", Salary: " + manager.getSalary() + " Ft");
+        // after removal
+        System.out.println("Salaries after removal:");
+        printSalaries(company);
 
 
-        System.out.println("Subcontractor tax number: " + subcontractor.getTaxNumber() + ", Salary: "
-        + subcontractor.getSalary() + " Ft");
+    }
 
+    private static void printSalaries(Company company) {
+        for (SalariedEntity entity : company.getSalariedEntities()) {
+            if (entity instanceof Employee) {
+                Employee emp = (Employee) entity; // (Employee) is needed
+                System.out.println(emp.getName() + ": " + emp.getSalary() + " Ft");
+            } else if (entity instanceof Subcontractor) {
+                Subcontractor sub = (Subcontractor) entity;
+                System.out.println("Subcontractor (Tax Number: " + sub.getTaxNumber() + "): " + sub.getSalary() + " Ft");
+            }
+        }
     }
 }
 
@@ -129,5 +156,38 @@ class Subcontractor implements SalariedEntity {
     @Override
     public float getSalary() {
         return salary;
-    }   
+    }
+}
+
+class Company {
+    private List<SalariedEntity> salariedEntities;
+
+    // empty arraylist
+    public Company() {
+        this.salariedEntities = new ArrayList<>();
+    }
+
+    public void addSalariedEntity(SalariedEntity entity) {
+        salariedEntities.add(entity);
+    }
+
+    public void removeSalariedEntity(SalariedEntity entity) {
+        // this doesn't remove a subordinate from a manager
+        salariedEntities.remove(entity);
+    }
+
+    public void raiseEmployeeSalaries(float percent) {
+        for (SalariedEntity entity : salariedEntities) {
+            // instanceof operator in Java is used to check the type of an object at runtime
+            if (entity instanceof Employee) {
+                ((Employee) entity).raiseSalary(percent); // entity.raise + tab formatted it this way,
+                // I have no idea about this syntax xd
+            }
+        }
+    }
+
+    public List<SalariedEntity> getSalariedEntities() {
+        // it needs to be new (?)
+        return new ArrayList<>(salariedEntities);
+    }
 }
