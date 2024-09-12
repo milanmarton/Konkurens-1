@@ -10,6 +10,9 @@ public class EmployeeTest {
         Subordinate sub1 = new Subordinate("Sanyi", 50000.0f);
         Subordinate sub2 = new Subordinate("Adorjan", 60000.0f);
 
+        // create subcontractor
+        Subcontractor subcontractor = new Subcontractor(123456789L, 75000.0f);
+
         // add subordinates to manager
         manager.addEmployee(sub1);
         manager.addEmployee(sub2);
@@ -24,11 +27,21 @@ public class EmployeeTest {
         System.out.println("\nAfter removing a subordinate:");
         System.out.println("Manager: " + manager.getName() + ", Salary: " + manager.getSalary() + " Ft");
 
+
+        System.out.println("Subcontractor tax number: " + subcontractor.getTaxNumber() + ", Salary: "
+        + subcontractor.getSalary() + " Ft");
+
     }
 }
 
-// put abstract before class to make it abstract :)
-abstract class Employee {
+
+// interface
+interface SalariedEntity {
+    float getSalary();
+}
+
+// implements is the keyword for classes that implement an interface
+abstract class Employee implements SalariedEntity {
     private String name;
     // private -> protected (to be able to access it from subclasses)
     protected float salary;
@@ -67,7 +80,7 @@ class Subordinate extends Employee {
         return salary;
     }
 }
-    
+
 class Manager extends Employee {
     private List<Employee> subordinates; // needs java.util.List but intellij imports it with 'List' + tab
 
@@ -96,4 +109,25 @@ class Manager extends Employee {
 
         return salary + (0.05f * totalSubordinateSalary);
     }
+}
+
+class Subcontractor implements SalariedEntity {
+    private long taxNumber;
+    private float salary;
+
+
+    public Subcontractor(long taxNumber, float salary) {
+        // 'this' keyword
+        this.taxNumber = taxNumber;
+        this.salary = salary;
+    }
+
+    public long getTaxNumber() {
+        return taxNumber;
+    }
+
+    @Override
+    public float getSalary() {
+        return salary;
+    }   
 }
